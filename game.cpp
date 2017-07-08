@@ -372,6 +372,58 @@ if(board[possrc]>=16)
 }
 
 
+void Game::shisteps(int possrc, QVector<int> &mvs){
+
+    static const int pianyi[]={15,17,-15,-17};
+    for(int i=0;i<4;i++)
+    {
+    if(IN_FORT(possrc+pianyi[i]))
+    if(!board[possrc+pianyi[i]])
+    mvs.append(lMOVE(possrc,possrc+pianyi[i]));
+    else if(butong(board[possrc+pianyi[i]],board[possrc]))
+    mvs.append(lMOVE(possrc,possrc+pianyi[i]));
+    }
+
+
+}
+
+
+void Game::xiangsteps(int possrc, QVector<int> &mvs){
+
+    static const int pianyi[]={30,34,-34,-30};
+    static const int xiangyanpanyi[]={15,17,-17,-15};
+    for(int i=0;i<4;i++)
+    {
+    if(IN_BOARD(possrc+pianyi[i])&&WEI_GUO(possrc+pianyi[i],board[possrc])&&!board[possrc+xiangyanpanyi[i]])
+    if(!board[possrc+pianyi[i]])
+    mvs.append(lMOVE(possrc,possrc+pianyi[i]));
+    else if(butong(board[possrc+pianyi[i]],board[possrc]))
+    mvs.append(lMOVE(possrc,possrc+pianyi[i]));
+    }
+
+
+
+}
+
+
+void Game::masteps(int possrc, QVector<int> &mvs){
+    static const int pianyi[4][2] = {{-33, -31}, {-18, 14}, {-14, 18}, {31, 33}};
+    static const int mayanpianyi[4]={-16, -1, 1, 16};
+    for(int i=0;i<4;i++)
+        for(int j=0;j<2;j++)
+    {
+
+    if(IN_BOARD(possrc+pianyi[i][j])&&!board[possrc+mayanpianyi[i]])
+    if(!board[possrc+pianyi[i][j]])
+    mvs.append(lMOVE(possrc,possrc+pianyi[i][j]));
+    else if(butong(board[possrc+pianyi[i][j]],board[possrc]))
+    mvs.append(lMOVE(possrc,possrc+pianyi[i][j]));
+    }
+
+
+}
+
+
 
 bool Game::canmove(int mv){
     qDebug("canmove");
@@ -388,13 +440,13 @@ bool Game::canmove(int mv){
         jiangsteps(possrc,mvs);
        break;
    case 1:
-       //url+="shi.png";
+       shisteps(possrc,mvs);
        break;
    case 2:
-       //url+="xiang.png";
+       xiangsteps(possrc,mvs);
        break;
    case 3:
-       //url+="ma.png";
+         masteps(possrc,mvs);
        break;
    case 4:
        chesteps(possrc,mvs);
