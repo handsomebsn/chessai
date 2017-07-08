@@ -120,16 +120,16 @@ public:
     //
     inline void xiangsteps(int sqsrc,QVector<int> &mvs);
     //
-    bool canmove(int mv);
+    bool canmove(int mv);//能否移动
     //a2
-    int makemove(int mv);
+    int makemove(int mv);//移动
     //
-    void unmove(int mv,int killsd);
+    void unmove(int mv,int killsd);//撤销移动
 
 
 public slots:
-   void paintEvent(QPaintEvent *event);
-   void mousePressEvent(QMouseEvent *event);
+   void paintEvent(QPaintEvent *event);//画图相应函数
+   void mousePressEvent(QMouseEvent *event);//鼠标相应函数
 
 };
 

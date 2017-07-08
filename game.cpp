@@ -4,7 +4,7 @@
 #define JIANGE 56
 #define RRRRRR 28
 #include<QRect>
-#define tong(a1,a2) (a1&16)==(a2&16)
+#define tong(a1,a2) (a1&16)==(a2&16)//同一种颜色 只取二进制数的第5位看是否相同
 Game::Game(QWidget *parent)
     : QWidget(parent)
 {
@@ -153,11 +153,11 @@ void Game::chesteps(int sqsrc, QVector<int> &mvs){
     qDebug("create che steps");
    int sqdst=sqsrc;
     for(sqdst++;IN_BOARD(sqdst);sqdst++){
-        if(!board[sqdst])
+        if(!board[sqdst])//无子
             mvs.append(lMOVE(sqsrc,sqdst));
-        else if(tong(board[sqdst],board[sqsrc]))
+        else if(tong(board[sqdst],board[sqsrc]))//有子同颜色
                break;
-        else{mvs.append(lMOVE(sqsrc,sqdst)); break;}
+        else{mvs.append(lMOVE(sqsrc,sqdst)); break;}//有子不同色
     }
     sqdst=sqsrc;
     for(sqdst--;IN_BOARD(sqdst);sqdst--){
