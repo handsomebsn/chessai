@@ -4,8 +4,8 @@
 #define JIANGE 56
 #define RRRRRR 28
 #include<QRect>
-#define tong(a1,a2) (a1&16)==(a2&16)//同一种颜色 只取二进制数的第5位看是否相同
-#define butong(a1,a2)  (a1&16)!=(a2&16)
+#define tong(id1,id2) (id1&16)==(id2&16)//同一种颜色 只取二进制数的第5位看是否相同
+#define butong(id1,id2)  (id1&16)!=(id2&16)
 Game::Game(QWidget *parent)
     : QWidget(parent)
 {
@@ -330,6 +330,47 @@ void Game::bingsteps(int possrc, QVector<int> &mvs){
 
 }
 
+void Game::jiangsteps(int possrc, QVector<int> &mvs){
+
+static const int pianyi[]={-1,1,-16,16};
+for(int i=0;i<4;i++)
+{
+if(IN_FORT(possrc+pianyi[i]))
+if(!board[possrc+pianyi[i]])
+mvs.append(lMOVE(possrc,possrc+pianyi[i]));
+else if(butong(board[possrc+pianyi[i]],board[possrc]))
+mvs.append(lMOVE(possrc,possrc+pianyi[i]));
+}
+/////////////////////////////////////////////////////
+if(board[possrc]>=16)
+{
+    for(int posdst=possrc+16;IN_BOARD(posdst);posdst+=16)
+       if(!board[posdst])
+           continue;
+       else if(board[posdst]!=8)
+           break;
+     else
+          mvs.append(lMOVE(possrc,posdst));
+
+}else{
+
+
+    for(int posdst=possrc-16;IN_BOARD(posdst);posdst-=16)
+           if(!board[posdst])
+               continue;
+           else if(board[posdst]!=16)
+               break;
+         else
+              mvs.append(lMOVE(possrc,posdst));
+
+
+}
+
+
+
+
+}
+
 
 
 bool Game::canmove(int mv){
@@ -344,7 +385,7 @@ bool Game::canmove(int mv){
     QVector <int> mvs;
    switch (tmp) {
    case 0:
-       //url+="jiang.png";
+        jiangsteps(possrc,mvs);
        break;
    case 1:
        //url+="shi.png";
