@@ -5,6 +5,7 @@
 #define RRRRRR 28
 #include<QRect>
 #define tong(a1,a2) (a1&16)==(a2&16)//同一种颜色 只取二进制数的第5位看是否相同
+#define butong(a1,a2)  (a1&16)!=(a2&16)
 Game::Game(QWidget *parent)
     : QWidget(parent)
 {
@@ -87,7 +88,7 @@ void Game::paintEvent(QPaintEvent *event){
      painter.begin(this);
      painter.drawImage(0,0,QImage(":/images/BOARD.BMP"));
      for(int pos=0;pos<256;pos++)
-         diposlay(pos);
+         display(pos);
      painter.end();
 }
 
@@ -95,7 +96,7 @@ void Game::paintEvent(QPaintEvent *event){
 B. 8~14依次表示player的帅、仕、相、马、车、炮和兵；
 C. 16~22依次表示computer的将、士、象、马、车、炮和卒。*/
 
-void Game::diposlay(int pos){
+void Game::display(int pos){
    if(board[pos]==0)
     return;
    int row=lrow(pos)-3;
@@ -259,8 +260,72 @@ void Game::paosteps(int possrc, QVector<int> &mvs){
 
 
 void Game::bingsteps(int possrc, QVector<int> &mvs){
+
    int posdst=possrc;
-   //if(board[possrc])
+    if(board[possrc]>=16)
+    if(WEI_GUO(possrc,board[possrc]))
+    { posdst+=16;
+     if(IN_BOARD(posdst))
+     if(!board[posdst])
+        mvs.append(lMOVE(possrc,posdst));
+      else if(butong(board[posdst],board[possrc]))
+       mvs.append(lMOVE(possrc,posdst));
+
+    }else{
+             posdst+=16;
+            if(IN_BOARD(posdst))
+            if(!board[posdst])
+                mvs.append(lMOVE(possrc,posdst));
+              else if(butong(board[posdst],board[possrc]))
+               mvs.append(lMOVE(possrc,posdst));
+            posdst-=17;
+           if(IN_BOARD(posdst))
+           if(!board[posdst])
+               mvs.append(lMOVE(possrc,posdst));
+             else if(butong(board[posdst],board[possrc]))
+              mvs.append(lMOVE(possrc,posdst));
+
+           posdst+=2;
+          if(IN_BOARD(posdst))
+          if(!board[posdst])
+              mvs.append(lMOVE(possrc,posdst));
+            else if(butong(board[posdst],board[possrc]))
+             mvs.append(lMOVE(possrc,posdst));
+    }
+    else
+    if(WEI_GUO(possrc,board[possrc]))
+    {
+        posdst-=16;
+             if(IN_BOARD(posdst))
+             if(!board[posdst])
+                mvs.append(lMOVE(possrc,posdst));
+              else if(butong(board[posdst],board[possrc]))
+               mvs.append(lMOVE(possrc,posdst));
+
+
+     }else{
+
+        posdst-=16;
+       if(IN_BOARD(posdst))
+       if(!board[posdst])
+           mvs.append(lMOVE(possrc,posdst));
+         else if(butong(board[posdst],board[possrc]))
+          mvs.append(lMOVE(possrc,posdst));
+       posdst+=17;
+      if(IN_BOARD(posdst))
+      if(!board[posdst])
+          mvs.append(lMOVE(possrc,posdst));
+        else if(butong(board[posdst],board[possrc]))
+         mvs.append(lMOVE(possrc,posdst));
+
+      posdst-=2;
+     if(IN_BOARD(posdst))
+     if(!board[posdst])
+         mvs.append(lMOVE(possrc,posdst));
+       else if(butong(board[posdst],board[possrc]))
+        mvs.append(lMOVE(possrc,posdst));
+
+     }
 
 
 }
@@ -297,7 +362,7 @@ bool Game::canmove(int mv){
         paosteps(possrc,mvs);
        break;
    case 6:
-       //url+="bing.png";
+       bingsteps(possrc,mvs);
        break;
 
 

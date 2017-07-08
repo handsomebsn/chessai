@@ -19,7 +19,7 @@ class Game : public QWidget
 private:
     char board[256];//下标pos反映了棋子的位置
     QPainter painter;
-    void diposlay(int pos);
+    void display(int pos);
     void gaoliangon(int pos){gaoliang[pos]=true;}
     void gaoliangoff(int pos){gaoliang[pos]=false;}
     bool gaoliang[256];
@@ -89,11 +89,11 @@ public:
 
     // 是否已过河
     inline bool YI_GUO(int pos, int id) {
-      return (pos & 0x80) == (id << 7);
+      return (pos & 0x80) == ((id&16) << 3);
     }
     // 是否未过河
     inline bool WEI_GUO(int pos, int id) {
-      return (pos & 0x80) != (id << 7);
+      return (pos & 0x80) != ((id&16) << 3);
     }
     //
     inline void chesteps(int possrc, QVector<int> &mvs);
