@@ -86,8 +86,8 @@ Game::~Game()
 void Game::paintEvent(QPaintEvent *event){
      painter.begin(this);
      painter.drawImage(0,0,QImage(":/images/BOARD.BMP"));
-     for(int sq=0;sq<256;sq++)
-         display(sq);
+     for(int pos=0;pos<256;pos++)
+         diposlay(pos);
      painter.end();
 }
 
@@ -95,18 +95,18 @@ void Game::paintEvent(QPaintEvent *event){
 B. 8~14依次表示player的帅、仕、相、马、车、炮和兵；
 C. 16~22依次表示computer的将、士、象、马、车、炮和卒。*/
 
-void Game::display(int sq){
-   if(board[sq]==0)
+void Game::diposlay(int pos){
+   if(board[pos]==0)
     return;
-   int row=lrow(sq)-3;
-   int col=lcol(sq)-3;
+   int row=lrow(pos)-3;
+   int col=lcol(pos)-3;
    QRect rect(col*JIANGE+OFFX-RRRRRR,row*JIANGE+OFFY-RRRRRR,2*RRRRRR,2*RRRRRR);
    int tmp;
    QString url(":/images/");
-   if(board[sq]<=14)
-   {tmp=board[sq]-8;url+="r";}
+   if(board[pos]<=14)
+   {tmp=board[pos]-8;url+="r";}
    else
-      {  tmp=board[sq]-16;url+="b";}
+      {  tmp=board[pos]-16;url+="b";}
    //qDebug("%d",tmp);
    switch (tmp) {
    case 0:
@@ -140,7 +140,7 @@ void Game::display(int sq){
 
 
 painter.drawImage(rect,QImage(url));
-if(gaoliang[sq])
+if(gaoliang[pos])
     painter.drawText(rect,"linght");
 
 
@@ -149,126 +149,133 @@ if(gaoliang[sq])
 
 
 
-void Game::chesteps(int sqsrc, QVector<int> &mvs){
+void Game::chesteps(int possrc, QVector<int> &mvs){
     qDebug("create che steps");
-   int sqdst=sqsrc;
-    for(sqdst++;IN_BOARD(sqdst);sqdst++){
-        if(!board[sqdst])//无子
-            mvs.append(lMOVE(sqsrc,sqdst));
-        else if(tong(board[sqdst],board[sqsrc]))//有子同颜色
+   int posdst=possrc;
+    for(posdst++;IN_BOARD(posdst);posdst++){
+        if(!board[posdst])//无子
+            mvs.append(lMOVE(possrc,posdst));
+        else if(tong(board[posdst],board[possrc]))//有子同颜色
                break;
-        else{mvs.append(lMOVE(sqsrc,sqdst)); break;}//有子不同色
+        else{mvs.append(lMOVE(possrc,posdst)); break;}//有子不同色
     }
-    sqdst=sqsrc;
-    for(sqdst--;IN_BOARD(sqdst);sqdst--){
-        if(!board[sqdst])
-            mvs.append(lMOVE(sqsrc,sqdst));
-        else if(tong(board[sqdst],board[sqsrc]))
+    posdst=possrc;
+    for(posdst--;IN_BOARD(posdst);posdst--){
+        if(!board[posdst])
+            mvs.append(lMOVE(possrc,posdst));
+        else if(tong(board[posdst],board[possrc]))
                break;
-        else{mvs.append(lMOVE(sqsrc,sqdst)); break;}
+        else{mvs.append(lMOVE(possrc,posdst)); break;}
     }
 
-    sqdst=sqsrc;
-    for(sqdst+=16;IN_BOARD(sqdst);sqdst+=16){
-        if(!board[sqdst])
-            mvs.append(lMOVE(sqsrc,sqdst));
-        else if(tong(board[sqdst],board[sqsrc]))
+    posdst=possrc;
+    for(posdst+=16;IN_BOARD(posdst);posdst+=16){
+        if(!board[posdst])
+            mvs.append(lMOVE(possrc,posdst));
+        else if(tong(board[posdst],board[possrc]))
                break;
-        else{mvs.append(lMOVE(sqsrc,sqdst)); break;}
+        else{mvs.append(lMOVE(possrc,posdst)); break;}
     }
-    sqdst=sqsrc;
-    for(sqdst-=16;IN_BOARD(sqdst);sqdst-=16){
-        if(!board[sqdst])
-            mvs.append(lMOVE(sqsrc,sqdst));
-        else if(tong(board[sqdst],board[sqsrc]))
+    posdst=possrc;
+    for(posdst-=16;IN_BOARD(posdst);posdst-=16){
+        if(!board[posdst])
+            mvs.append(lMOVE(possrc,posdst));
+        else if(tong(board[posdst],board[possrc]))
                break;
-        else{mvs.append(lMOVE(sqsrc,sqdst)); break;}
+        else{mvs.append(lMOVE(possrc,posdst)); break;}
     }
 
 }
 
-void Game::paosteps(int sqsrc, QVector<int> &mvs){
-    int sqdst=sqsrc;
+void Game::paosteps(int possrc, QVector<int> &mvs){
+    int posdst=possrc;
     int linenum=0;
 
-        for(sqdst++;IN_BOARD(sqdst);sqdst++){
+        for(posdst++;IN_BOARD(posdst);posdst++){
           if(!linenum){
-               if(!board[sqdst])
-                  mvs.append(lMOVE(sqsrc,sqdst));
+               if(!board[posdst])
+                  mvs.append(lMOVE(possrc,posdst));
                  else
                    linenum++;
           }else{
-               if(!board[sqdst])
+               if(!board[posdst])
                    continue;
-               else if(tong(board[sqdst],board[sqsrc]))
+               else if(tong(board[posdst],board[possrc]))
                       break;
-               else{mvs.append(lMOVE(sqsrc,sqdst)); break;}
+               else{mvs.append(lMOVE(possrc,posdst)); break;}
             }
         }
-        sqdst=sqsrc;
+        posdst=possrc;
         linenum=0;
-        for(sqdst--;IN_BOARD(sqdst);sqdst--){
+        for(posdst--;IN_BOARD(posdst);posdst--){
           if(!linenum){
-               if(!board[sqdst])
-                  mvs.append(lMOVE(sqsrc,sqdst));
+               if(!board[posdst])
+                  mvs.append(lMOVE(possrc,posdst));
                  else
                    linenum++;
           }else{
-               if(!board[sqdst])
+               if(!board[posdst])
                    continue;
-               else if(tong(board[sqdst],board[sqsrc]))
+               else if(tong(board[posdst],board[possrc]))
                       break;
-               else{mvs.append(lMOVE(sqsrc,sqdst)); break;}
+               else{mvs.append(lMOVE(possrc,posdst)); break;}
             }
         }
-        sqdst=sqsrc;
+        posdst=possrc;
         linenum=0;
-        for(sqdst+=16;IN_BOARD(sqdst);sqdst+=16){
+        for(posdst+=16;IN_BOARD(posdst);posdst+=16){
           if(!linenum){
-               if(!board[sqdst])
-                  mvs.append(lMOVE(sqsrc,sqdst));
+               if(!board[posdst])
+                  mvs.append(lMOVE(possrc,posdst));
                  else
                    linenum++;
           }else{
-               if(!board[sqdst])
+               if(!board[posdst])
                    continue;
-               else if(tong(board[sqdst],board[sqsrc]))
+               else if(tong(board[posdst],board[possrc]))
                       break;
-               else{mvs.append(lMOVE(sqsrc,sqdst)); break;}
+               else{mvs.append(lMOVE(possrc,posdst)); break;}
             }
         }
-        sqdst=sqsrc;
+        posdst=possrc;
         linenum=0;
-        for(sqdst-=16;IN_BOARD(sqdst);sqdst-=16){
+        for(posdst-=16;IN_BOARD(posdst);posdst-=16){
           if(!linenum){
-               if(!board[sqdst])
-                  mvs.append(lMOVE(sqsrc,sqdst));
+               if(!board[posdst])
+                  mvs.append(lMOVE(possrc,posdst));
                  else
                    linenum++;
           }else{
-               if(!board[sqdst])
+               if(!board[posdst])
                    continue;
-               else if(tong(board[sqdst],board[sqsrc]))
+               else if(tong(board[posdst],board[possrc]))
                       break;
-               else{mvs.append(lMOVE(sqsrc,sqdst)); break;}
+               else{mvs.append(lMOVE(possrc,posdst)); break;}
             }
         }
 
 
 }
 
+
+void Game::bingsteps(int possrc, QVector<int> &mvs){
+   int posdst=possrc;
+   //if(board[possrc])
+
+
+}
 
 
 
 bool Game::canmove(int mv){
     qDebug("canmove");
-   int sqsrc=lSRC(mv);
-   if(board[sqsrc]==0)return false;
+   int possrc=lSRC(mv);
+   if(board[possrc]==0)return false;
    int tmp;
-   if(board[sqsrc]<=14)
-   {tmp=board[sqsrc]-8;}
+   if(board[possrc]<=14)
+   {tmp=board[possrc]-8;}
    else
-      {  tmp=board[sqsrc]-16;}
+      {  tmp=board[possrc]-16;}
     QVector <int> mvs;
    switch (tmp) {
    case 0:
@@ -284,10 +291,10 @@ bool Game::canmove(int mv){
        //url+="ma.png";
        break;
    case 4:
-       chesteps(sqsrc,mvs);
+       chesteps(possrc,mvs);
        break;
    case 5:
-        paosteps(sqsrc,mvs);
+        paosteps(possrc,mvs);
        break;
    case 6:
        //url+="bing.png";
@@ -305,40 +312,40 @@ return mvs.contains(mv);
 
 void Game::mousePressEvent(QMouseEvent *event){
     int row,col;
-    static int  sqsrc=0;
-     static int sqdst=0;
+    static int  possrc=0;
+     static int posdst=0;
     static int sdsrc=0;
     static int sddst=0;
    if(sdsrc==0)
 {row=(event->y()-OFFY+JIANGE/2)/JIANGE+3;
    col=(event->x()-OFFX+JIANGE/2)/JIANGE+3;
 
-   sqsrc=lsq(row,col);
-    qDebug("%d",sqsrc);
-   if(sqsrc<0||sqsrc>255)
+   possrc=lpos(row,col);
+    qDebug("%d",possrc);
+   if(possrc<0||possrc>255)
        return;
-   sdsrc=board[sqsrc];
+   sdsrc=board[possrc];
    qDebug("sdsrc %d",sdsrc);
  if(sdsrc)
-     gaoliangon(sqsrc);
+     gaoliangon(possrc);
 
 }else{
        row=(event->y()-OFFY+JIANGE/2)/JIANGE+3;
           col=(event->x()-OFFX+JIANGE/2)/JIANGE+3;
-       sqdst=lsq(row,col);
-       qDebug("sqdst %d",sqdst);
-       if(sqdst<0||sqdst>255)
+       posdst=lpos(row,col);
+       qDebug("posdst %d",posdst);
+       if(posdst<0||posdst>255)
            return;
-       sddst=board[sqdst];
+       sddst=board[posdst];
        if(sddst)
      if(tong(sddst,sdsrc))
-     { gaoliangoff(sqsrc);   qDebug("xiangtong"); sqsrc=sqdst;sdsrc=sddst;gaoliangon(sqsrc);update();return;}
-     if(canmove(lMOVE(sqsrc,sqdst)))
+     { gaoliangoff(possrc);   qDebug("xiangtong"); possrc=posdst;sdsrc=sddst;gaoliangon(possrc);update();return;}
+     if(canmove(lMOVE(possrc,posdst)))
      {qDebug("haha");
          sdsrc=0;
-         gaoliangoff(sqsrc);
-         int k=makemove(lMOVE(sqsrc,sqdst));
-         //unmove(lMOVE(sqsrc,sqdst),k);
+         gaoliangoff(possrc);
+         int k=makemove(lMOVE(possrc,posdst));
+         //unmove(lMOVE(possrc,posdst),k);
      }
    }
 
