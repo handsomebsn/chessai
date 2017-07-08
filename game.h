@@ -162,6 +162,7 @@ private:
           computerscore += stonesscores[id - 16][HUAN_ZHUAN(pos)];
           //zobr.Xor(Zobrist.Table[id - 9][pos]);
         }
+
       }
     inline void DelStone(int pos,int id){
 
@@ -175,7 +176,12 @@ private:
              // zobr.Xor(Zobrist.Table[id - 9][pos]);
             }
     }
-
+    inline int getMinScore(int level, int curMin);
+    inline int getMaxScore(int level, int curMax);
+    int getcomputerbeststep();
+    int _level;
+    bool gameover;
+    bool computerturn;
 public:
     Game(QWidget *parent = 0);
     ~Game();
@@ -262,14 +268,17 @@ public:
     bool canmove(int mv);//能否移动
     //a2
     int makemove(int mv);//移动
+    void makemove1(int mv);
     //
     void unmove(int mv,int killid);//撤销移动
+    ////////////////////////////////////
+   inline void getAllsteps(QVector<int> &mvs,bool player=false);
 
 
 public slots:
    void paintEvent(QPaintEvent *event);//画图相应函数
    void mousePressEvent(QMouseEvent *event);//鼠标相应函数
-
+  void mouseReleaseEvent(QMouseEvent *event);
 };
 
 #endif // GAME_H

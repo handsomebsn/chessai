@@ -9,6 +9,9 @@
 Game::Game(QWidget *parent)
     : QWidget(parent)
 {
+    gameover=false;
+    _level=4;
+    computerturn=false;
     // 棋盘初始设置
 
   const char _board[256] = {
@@ -152,7 +155,7 @@ if(gaoliang[pos])
 
 
 
-void Game::chesteps(int possrc, QVector<int> &mvs){
+inline void Game::chesteps(int possrc, QVector<int> &mvs){
     qDebug("create che steps");
    int posdst=possrc;
     for(posdst++;IN_BOARD(posdst);posdst++){
@@ -190,7 +193,7 @@ void Game::chesteps(int possrc, QVector<int> &mvs){
 
 }
 
-void Game::paosteps(int possrc, QVector<int> &mvs){
+inline void Game::paosteps(int possrc, QVector<int> &mvs){
     int posdst=possrc;
     int linenum=0;
 
@@ -261,7 +264,7 @@ void Game::paosteps(int possrc, QVector<int> &mvs){
 }
 
 
-void Game::bingsteps(int possrc, QVector<int> &mvs){
+inline void Game::bingsteps(int possrc, QVector<int> &mvs){
 
    int posdst=possrc;
     if(board[possrc]>=16)
@@ -333,7 +336,7 @@ void Game::bingsteps(int possrc, QVector<int> &mvs){
 
 }
 
-void Game::jiangsteps(int possrc, QVector<int> &mvs){
+inline void Game::jiangsteps(int possrc, QVector<int> &mvs){
 
 static const int pianyi[]={-1,1,-16,16};
 for(int i=0;i<4;i++)
@@ -375,7 +378,7 @@ if(board[possrc]>=16)
 }
 
 
-void Game::shisteps(int possrc, QVector<int> &mvs){
+inline void Game::shisteps(int possrc, QVector<int> &mvs){
 
     static const int pianyi[]={15,17,-15,-17};
     for(int i=0;i<4;i++)
@@ -391,7 +394,7 @@ void Game::shisteps(int possrc, QVector<int> &mvs){
 }
 
 
-void Game::xiangsteps(int possrc, QVector<int> &mvs){
+inline void Game::xiangsteps(int possrc, QVector<int> &mvs){
 
     static const int pianyi[]={30,34,-34,-30};
     static const int xiangyanpanyi[]={15,17,-17,-15};
@@ -409,7 +412,7 @@ void Game::xiangsteps(int possrc, QVector<int> &mvs){
 }
 
 
-void Game::masteps(int possrc, QVector<int> &mvs){
+inline void Game::masteps(int possrc, QVector<int> &mvs){
     static const int pianyi[4][2] = {{-33, -31}, {-18, 14}, {-14, 18}, {31, 33}};
     static const int mayanpianyi[4]={-16, -1, 1, 16};
     for(int i=0;i<4;i++)
@@ -472,6 +475,9 @@ return mvs.contains(mv);
 
 
 void Game::mousePressEvent(QMouseEvent *event){
+    if(computerturn)
+        return;
+
     int row,col;
     static int  possrc=0;
      static int posdst=0;
@@ -505,7 +511,7 @@ void Game::mousePressEvent(QMouseEvent *event){
      {qDebug("haha");
          sdsrc=0;
          gaoliangoff(possrc);
-         makemove(lMOVE(possrc,posdst));
+         makemove1(lMOVE(possrc,posdst));
          //unmove(lMOVE(possrc,posdst),k);
      }
    }
@@ -518,6 +524,8 @@ int Game::makemove(int mv){
 int dst=lDST(mv);
 int killid=board[dst];
 int moveid=board[src];
+if(killid==8||killid==16)
+gameover=true;
 if(killid)
 DelStone(dst,killid);
 DelStone(src,moveid);
@@ -525,11 +533,172 @@ AddStone(dst,moveid);
 qDebug("SCORE:%d",score());
 return killid;
 }
+void Game::makemove1(int mv){
+    int src=lSRC(mv);
+   int dst=lDST(mv);
+   int killid=board[dst];
+   int moveid=board[src];
+   if(killid==8||killid==16)
+   gameover=true;
+   if(killid)
+   DelStone(dst,killid);
+   DelStone(src,moveid);
+   AddStone(dst,moveid);
+   qDebug("move SCORE:%d",score());
+   if(computerturn)
+       computerturn=false;
+   else
+       computerturn=true;
+
+
+}
 void Game::unmove(int mv, int killid){
+    if(killid==8||killid==16)
+    gameover=false;
     int src=lSRC(mv);
    int dst=lDST(mv);
    int id=board[dst];
    DelStone(dst,id);
    AddStone(src,id);
+   if(killid)
    AddStone(dst,killid);
+   qDebug("ummove SCORE:%d",score());
+}
+inline void Game::getAllsteps(QVector<int> &mvs, bool player){
+    int tmp;
+
+    for(int possrc=0;possrc<256;possrc++){
+        if(board[possrc]>14&&!player)
+            tmp=board[possrc]-16;
+        else if(board[possrc]<=14&&board[possrc]>7&&player)
+            tmp=board[possrc]-8;
+        else
+            continue;
+
+qDebug("tmp=%d",tmp);
+    switch (tmp) {
+    case 0:
+         jiangsteps(possrc,mvs);
+        break;
+    case 1:
+        shisteps(possrc,mvs);
+        break;
+    case 2:
+        xiangsteps(possrc,mvs);
+        break;
+    case 3:
+          masteps(possrc,mvs);
+        break;
+    case 4:
+        chesteps(possrc,mvs);
+        break;
+    case 5:
+         paosteps(possrc,mvs);
+        break;
+    case 6:
+        bingsteps(possrc,mvs);
+        break;
+
+
+
+    default:
+        break;
+    }
+
+
+    }
+}
+
+int Game::getMinScore(int level, int curMin)
+{int killid;
+    if(level == 0)
+    {
+        return score();
+    }
+   // if(gameover)
+    //return score();
+    QVector<int> steps;
+    getAllsteps(steps,true);
+    int minInAllMaxScore = 300000;
+    for(int i=0;i<steps.count();i++)
+    {
+        killid=makemove(steps.at(i));
+       // qDebug("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww");
+        int maxScore = getMaxScore(level - 1, minInAllMaxScore);
+        unmove(steps.at(i),killid);
+//qDebug("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww");
+//qDebug("step:%d",steps.at(i));
+        if(maxScore <= curMin)
+        {
+        qDebug("..............................");
+            return maxScore;
+        }
+
+        if(maxScore < minInAllMaxScore)
+        {
+            minInAllMaxScore = maxScore;
+        }
+    }
+    return minInAllMaxScore;
+}
+
+int Game::getMaxScore(int level, int curMax)
+{int killid;
+    if(level == 0)
+        return score();
+    //if(gameover)
+    //return score();
+    QVector<int> steps;
+    getAllsteps(steps,false);
+    int maxInAllMinScore = -300000;
+    for(int i=0;i<steps.count();i++)
+    {
+        killid=makemove(steps.at(i));
+        int minScore = getMinScore(level - 1, maxInAllMinScore);
+        unmove(steps.at(i),killid);
+        //qDebug("mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm");
+        if(minScore >= curMax)
+        {
+            return minScore;
+        }
+        if(minScore > maxInAllMinScore)
+        {
+            maxInAllMinScore = minScore;
+        }
+    }
+    return maxInAllMinScore;
+}
+int Game::getcomputerbeststep(){
+   int beststep;
+   int killid;
+   QVector<int> steps;
+    getAllsteps(steps,false);
+    //qDebug("gong you %d zou fa",steps.count());
+      int maxInAllMinScore = -300000;
+
+      for(int i=0;i<steps.count();i++)
+      {
+          killid=makemove(steps.at(i));
+          int minScore = getMinScore(_level, maxInAllMinScore);
+           //qDebug("jumianfenshu %d",minScore);
+          unmove(steps.at(i),killid);
+          if(minScore > maxInAllMinScore)
+          {
+              maxInAllMinScore = minScore;
+              beststep=steps.at(i);
+          }
+      }
+
+return beststep;
+}
+
+void Game::mouseReleaseEvent(QMouseEvent *event){
+if(computerturn){
+int mv=getcomputerbeststep();
+
+
+makemove1(mv);
+update();
+
+}
 }
