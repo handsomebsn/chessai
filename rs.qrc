@@ -1,0 +1,31 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/bbing.png</file>
+        <file>images/bche.png</file>
+        <file>images/bjiang.png</file>
+        <file>images/bma.png</file>
+        <file>images/BOARD.BMP</file>
+        <file>images/bpao.png</file>
+        <file>images/bshi.png</file>
+        <file>images/bxiang.png</file>
+        <file>images/rbing.png</file>
+        <file>images/rche.png</file>
+        <file>images/rjiang.png</file>
+        <file>images/rma.png</file>
+        <file>images/rpao.png</file>
+        <file>images/rshi.png</file>
+        <file>images/rxiang.png</file>
+        <file>music/CAPTURE.WAV</file>
+        <file>music/CAPTURE2.WAV</file>
+        <file>music/CHECK.WAV</file>
+        <file>music/CHECK2.WAV</file>
+        <file>music/CLICK.WAV</file>
+        <file>music/DRAW.WAV</file>
+        <file>music/ILLEGAL.WAV</file>
+        <file>music/LOSS.WAV</file>
+        <file>music/MOVE.WAV</file>
+        <file>music/MOVE2.WAV</file>
+        <file>music/RC.BMP</file>
+        <file>music/WIN.WAV</file>
+    </qresource>
+</RCC>
