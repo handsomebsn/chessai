@@ -69,7 +69,8 @@ Game::Game(QWidget *parent)
      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
    };
-
+  computerscore=0;
+  playerscore=0;
 
     memcpy(board,_board,256);
     memcpy(inboard,_inboard,256);
@@ -78,6 +79,7 @@ Game::Game(QWidget *parent)
         gaoliang[i]=false;
     setMinimumSize(520,576);
     setMaximumSize(520,576);
+
 }
 
 Game::~Game()
@@ -270,6 +272,7 @@ void Game::bingsteps(int possrc, QVector<int> &mvs){
         mvs.append(lMOVE(possrc,posdst));
       else if(butong(board[posdst],board[possrc]))
        mvs.append(lMOVE(possrc,posdst));
+
 
     }else{
              posdst+=16;
@@ -502,7 +505,7 @@ void Game::mousePressEvent(QMouseEvent *event){
      {qDebug("haha");
          sdsrc=0;
          gaoliangoff(possrc);
-         int k=makemove(lMOVE(possrc,posdst));
+         makemove(lMOVE(possrc,posdst));
          //unmove(lMOVE(possrc,posdst),k);
      }
    }
@@ -513,15 +516,20 @@ update();
 int Game::makemove(int mv){
  int src=lSRC(mv);
 int dst=lDST(mv);
-int killsd=board[dst];
-board[dst]=board[src];
-board[src]=0;
-return killsd;
+int killid=board[dst];
+int moveid=board[src];
+if(killid)
+DelStone(dst,killid);
+DelStone(src,moveid);
+AddStone(dst,moveid);
+qDebug("SCORE:%d",score());
+return killid;
 }
-void Game::unmove(int mv, int killsd){
+void Game::unmove(int mv, int killid){
     int src=lSRC(mv);
    int dst=lDST(mv);
-   board[src]=board[dst];
-   board[dst]=killsd;
-
+   int id=board[dst];
+   DelStone(dst,id);
+   AddStone(src,id);
+   AddStone(dst,killid);
 }
