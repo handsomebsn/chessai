@@ -4,11 +4,13 @@
 #define JIANGE 56
 #define RRRRRR 28
 #include<QRect>
+#include <QtAlgorithms>
 #define tong(id1,id2) (id1&16)==(id2&16)//同一种颜色 只取二进制数的第5位看是否相同
 #define butong(id1,id2)  (id1&16)!=(id2&16)
+int Game::nHistoryTable[65536];
 Game::Game(QWidget *parent)
     : QWidget(parent)
-{
+{nDistance=0;
     gameover=false;
     _level=4;
     computerturn=false;
@@ -530,6 +532,7 @@ if(killid)
 DelStone(dst,killid);
 DelStone(src,moveid);
 AddStone(dst,moveid);
+nDistance++;
 qDebug("SCORE:%d",score());
 return killid;
 }
@@ -545,6 +548,7 @@ void Game::makemove1(int mv){
    DelStone(src,moveid);
    AddStone(dst,moveid);
    qDebug("move SCORE:%d",score());
+   nDistance++;
    if(computerturn)
        computerturn=false;
    else
@@ -562,6 +566,7 @@ void Game::unmove(int mv, int killid){
    AddStone(src,id);
    if(killid)
    AddStone(dst,killid);
+   nDistance--;
    qDebug("ummove SCORE:%d",score());
 }
 inline void Game::getAllsteps(QVector<int> &mvs, bool player){
@@ -615,8 +620,8 @@ int Game::getMinScore(int level, int curMin)
     {
         return score();
     }
-   // if(gameover)
-    //return score();
+    if(gameover)
+    return score();
     QVector<int> steps;
     getAllsteps(steps,true);
     int minInAllMaxScore = 300000;
@@ -646,8 +651,8 @@ int Game::getMaxScore(int level, int curMax)
 {int killid;
     if(level == 0)
         return score();
-    //if(gameover)
-    //return score();
+    if(gameover)
+    return score();
     QVector<int> steps;
     getAllsteps(steps,false);
     int maxInAllMinScore = -300000;
@@ -686,6 +691,8 @@ int Game::getcomputerbeststep(){
           {
               maxInAllMinScore = minScore;
               beststep=steps.at(i);
+
+
           }
       }
 
@@ -694,11 +701,69 @@ return beststep;
 
 void Game::mouseReleaseEvent(QMouseEvent *event){
 if(computerturn){
-int mv=getcomputerbeststep();
+SearchMain();
 
 
-makemove1(mv);
+makemove1(mvResult);
 update();
 
 }
+}
+// 超出边界(Fail-Soft)的Alpha-Beta搜索过程
+ int Game::SearchFull(int vlAlpha, int vlBeta, int nDepth) {
+  int i, nGenMoves, pcCaptured;
+  int vl, vlBest, mvBest;
+  QVector<int > mvs;
+  // 一个Alpha-Beta完全搜索分为以下几个阶段
+
+  // 1. 到达水平线，则返回局面评价值
+  if (nDepth == 0) {
+    return score();
+  }
+
+  // 2. 初始化最佳值和最佳走法
+  vlBest = -30000; // 这样可以知道，是否一个走法都没走过(杀棋)
+  mvBest = 0;           // 这样可以知道，是否搜索到了Beta走法或PV走法，以便保存到历史表
+
+  // 3. 生成全部走法，并根据历史表排序
+  getAllsteps(mvs);
+  nGenMoves=mvs.count();
+  //qsort((void*)mvs.begin(), nGenMoves, sizeof(int), CompareHistory);
+  qSort(mvs.begin(),mvs.end(), CompareHistory);
+
+  // 4. 逐一走这些走法，并进行递归
+  for (i = 0; i < nGenMoves; i ++) {
+       pcCaptured= makemove(mvs.at(i));
+      vl = -SearchFull(-vlBeta, -vlAlpha, nDepth - 1);
+      unmove(mvs.at(i),pcCaptured);
+
+      // 5. 进行Alpha-Beta大小判断和截断
+      if (vl > vlBest) {    // 找到最佳值(但不能确定是Alpha、PV还是Beta走法)
+        vlBest = vl;        // "vlBest"就是目前要返回的最佳值，可能超出Alpha-Beta边界
+        if (vl >= vlBeta) { // 找到一个Beta走法
+          mvBest = mvs.at(i);  // Beta走法要保存到历史表
+          break;            // Beta截断
+        }
+        if (vl > vlAlpha) { // 找到一个PV走法
+          mvBest = mvs.at(i);  // PV走法要保存到历史表
+          vlAlpha = vl;     // 缩小Alpha-Beta边界
+        }
+      }
+
+  }
+
+  // 5. 所有走法都搜索完了，把最佳走法(不能是Alpha走法)保存到历史表，返回最佳值
+  if (vlBest == -30000) {
+    // 如果是杀棋，就根据杀棋步数给出评价
+    return nDistance - 30000;
+  }
+  if (mvBest != 0) {
+    // 如果不是Alpha走法，就将最佳走法保存到历史表
+    nHistoryTable[mvBest] += nDepth * nDepth;
+    if (nDistance == 0) {
+      // 搜索根节点时，总是有一个最佳走法(因为全窗口搜索不会超出边界)，将这个走法保存下来
+      mvResult = mvBest;
+    }
+  }
+  return vlBest;
 }

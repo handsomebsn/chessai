@@ -139,6 +139,44 @@ static const int stonesscores[7][256] = {
 class Game : public QWidget
 {
     Q_OBJECT
+public:
+    // 迭代加深搜索过程
+     void SearchMain(void) {
+
+
+         int i, t, vl;
+
+         // 初始化
+         memset(nHistoryTable, 0, 65536 * sizeof(int)); // 清空历史表
+         t = clock();       // 初始化定时器
+        nDistance = 0; // 初始步数
+
+         // 迭代加深过程
+
+         for (i = 0; i <= 30; i ++) {
+           vl = SearchFull(-30000, 30000, i);
+           // 搜索到杀棋，就终止搜索
+           if (vl > 29000 || vl < -29000) {
+             break;
+           }
+           // 超过一秒，就终止搜索
+           if (clock() - t > CLOCKS_PER_SEC) {
+             break;
+           }
+         }
+     qDebug("depth:%d" ,i);
+
+    }
+
+
+    static int CompareHistory(const int &lpmv1, const int &lpmv2) {
+        //return 1;
+      return nHistoryTable[ lpmv2] - nHistoryTable[lpmv1];
+    }
+ private:
+    static int nHistoryTable[65536];
+    int mvResult;
+
 private:
     char board[256];//下标pos反映了棋子的位置
     QPainter painter;
@@ -179,9 +217,11 @@ private:
     inline int getMinScore(int level, int curMin);
     inline int getMaxScore(int level, int curMax);
     int getcomputerbeststep();
+     int SearchFull(int vlAlpha, int vlBeta, int nDepth);
     int _level;
     bool gameover;
     bool computerturn;
+    int nDistance;
 public:
     Game(QWidget *parent = 0);
     ~Game();
