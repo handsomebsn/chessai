@@ -134,7 +134,14 @@ static const int stonesscores[7][256] = {
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0
   }
 };
-
+class MV{
+public:
+int possrc;
+int posdst;
+MV(){}
+MV(int _possrc,int _posdst){possrc=_possrc;posdst=_posdst; }
+bool operator ==(const MV &mv)const{return possrc==mv.possrc&&posdst==mv.posdst;}
+};
 
 class Game : public QWidget
 {
@@ -169,13 +176,13 @@ public:
     }
 
 
-    static int CompareHistory(const int &lpmv1, const int &lpmv2) {
-        //return 1;
-      return nHistoryTable[ lpmv2] - nHistoryTable[lpmv1];
+    static int CompareHistory(const MV &lpmv1, const MV &lpmv2) {
+        return 1;
+     // return nHistoryTable[ lpmv2] - nHistoryTable[lpmv1];
     }
  private:
     static int nHistoryTable[65536];
-    int mvResult;
+    MV mvResult;
 
 private:
     char board[256];//下标pos反映了棋子的位置
@@ -216,7 +223,7 @@ private:
     }
     inline int getMinScore(int level, int curMin);
     inline int getMaxScore(int level, int curMax);
-    int getcomputerbeststep();
+    MV getcomputerbeststep();
      int SearchFull(int vlAlpha, int vlBeta, int nDepth);
     int _level;
     bool gameover;
@@ -291,28 +298,28 @@ public:
       return (pos & 0x80) != ((id&16) << 3);
     }
     //
-    inline void chesteps(int possrc, QVector<int> &mvs);
+    inline void chesteps(int possrc, QVector<MV> &mvs);
     //
-    inline void masteps(int possrc,QVector<int> &mvs);
+    inline void masteps(int possrc,QVector<MV> &mvs);
     //
-    inline void paosteps(int possrc,QVector<int> &mvs);
+    inline void paosteps(int possrc,QVector<MV> &mvs);
     //
-    inline void bingsteps(int possrc,QVector<int> &mvs);
+    inline void bingsteps(int possrc,QVector<MV> &mvs);
     //
-    inline void jiangsteps(int possrc,QVector<int> &mvs);
+    inline void jiangsteps(int possrc,QVector<MV> &mvs);
     //
-    inline void shisteps(int possrc,QVector<int> &mvs);
+    inline void shisteps(int possrc,QVector<MV> &mvs);
     //
-    inline void xiangsteps(int possrc,QVector<int> &mvs);
+    inline void xiangsteps(int possrc,QVector<MV> &mvs);
     //
-    bool canmove(int mv);//能否移动
+    bool canmove(MV mv);//能否移动
     //a2
-    int makemove(int mv);//移动
-    void makemove1(int mv);
+    int makemove(MV mv);//移动
+    void makemove1(MV mv);
     //
-    void unmove(int mv,int killid);//撤销移动
+    void unmove(MV mv,int killid);//撤销移动
     ////////////////////////////////////
-   inline void getAllsteps(QVector<int> &mvs,bool player=false);
+   inline void getAllsteps(QVector<MV> &mvs,bool player=false);
 
 
 public slots:

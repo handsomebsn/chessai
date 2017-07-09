@@ -12,7 +12,7 @@ Game::Game(QWidget *parent)
     : QWidget(parent)
 {nDistance=0;
     gameover=false;
-    _level=4;
+    _level=3;
     computerturn=false;
     // 棋盘初始设置
 
@@ -157,52 +157,52 @@ if(gaoliang[pos])
 
 
 
-inline void Game::chesteps(int possrc, QVector<int> &mvs){
+inline void Game::chesteps(int possrc, QVector<MV> &mvs){
     qDebug("create che steps");
    int posdst=possrc;
     for(posdst++;IN_BOARD(posdst);posdst++){
         if(!board[posdst])//无子
-            mvs.append(lMOVE(possrc,posdst));
+            mvs.append(MV(possrc,posdst));
         else if(tong(board[posdst],board[possrc]))//有子同颜色
                break;
-        else{mvs.append(lMOVE(possrc,posdst)); break;}//有子不同色
+        else{mvs.append(MV(possrc,posdst)); break;}//有子不同色
     }
     posdst=possrc;
     for(posdst--;IN_BOARD(posdst);posdst--){
         if(!board[posdst])
-            mvs.append(lMOVE(possrc,posdst));
+            mvs.append(MV(possrc,posdst));
         else if(tong(board[posdst],board[possrc]))
                break;
-        else{mvs.append(lMOVE(possrc,posdst)); break;}
+        else{mvs.append(MV(possrc,posdst)); break;}
     }
 
     posdst=possrc;
     for(posdst+=16;IN_BOARD(posdst);posdst+=16){
         if(!board[posdst])
-            mvs.append(lMOVE(possrc,posdst));
+            mvs.append(MV(possrc,posdst));
         else if(tong(board[posdst],board[possrc]))
                break;
-        else{mvs.append(lMOVE(possrc,posdst)); break;}
+        else{mvs.append(MV(possrc,posdst)); break;}
     }
     posdst=possrc;
     for(posdst-=16;IN_BOARD(posdst);posdst-=16){
         if(!board[posdst])
-            mvs.append(lMOVE(possrc,posdst));
+            mvs.append(MV(possrc,posdst));
         else if(tong(board[posdst],board[possrc]))
                break;
-        else{mvs.append(lMOVE(possrc,posdst)); break;}
+        else{mvs.append(MV(possrc,posdst)); break;}
     }
 
 }
 
-inline void Game::paosteps(int possrc, QVector<int> &mvs){
+inline void Game::paosteps(int possrc, QVector<MV> &mvs){
     int posdst=possrc;
     int linenum=0;
 
         for(posdst++;IN_BOARD(posdst);posdst++){
           if(!linenum){
                if(!board[posdst])
-                  mvs.append(lMOVE(possrc,posdst));
+                  mvs.append(MV(possrc,posdst));
                  else
                    linenum++;
           }else{
@@ -210,7 +210,7 @@ inline void Game::paosteps(int possrc, QVector<int> &mvs){
                    continue;
                else if(tong(board[posdst],board[possrc]))
                       break;
-               else{mvs.append(lMOVE(possrc,posdst)); break;}
+               else{mvs.append(MV(possrc,posdst)); break;}
             }
         }
         posdst=possrc;
@@ -218,7 +218,7 @@ inline void Game::paosteps(int possrc, QVector<int> &mvs){
         for(posdst--;IN_BOARD(posdst);posdst--){
           if(!linenum){
                if(!board[posdst])
-                  mvs.append(lMOVE(possrc,posdst));
+                  mvs.append(MV(possrc,posdst));
                  else
                    linenum++;
           }else{
@@ -226,7 +226,7 @@ inline void Game::paosteps(int possrc, QVector<int> &mvs){
                    continue;
                else if(tong(board[posdst],board[possrc]))
                       break;
-               else{mvs.append(lMOVE(possrc,posdst)); break;}
+               else{mvs.append(MV(possrc,posdst)); break;}
             }
         }
         posdst=possrc;
@@ -234,7 +234,7 @@ inline void Game::paosteps(int possrc, QVector<int> &mvs){
         for(posdst+=16;IN_BOARD(posdst);posdst+=16){
           if(!linenum){
                if(!board[posdst])
-                  mvs.append(lMOVE(possrc,posdst));
+                  mvs.append(MV(possrc,posdst));
                  else
                    linenum++;
           }else{
@@ -242,7 +242,7 @@ inline void Game::paosteps(int possrc, QVector<int> &mvs){
                    continue;
                else if(tong(board[posdst],board[possrc]))
                       break;
-               else{mvs.append(lMOVE(possrc,posdst)); break;}
+               else{mvs.append(MV(possrc,posdst)); break;}
             }
         }
         posdst=possrc;
@@ -250,7 +250,7 @@ inline void Game::paosteps(int possrc, QVector<int> &mvs){
         for(posdst-=16;IN_BOARD(posdst);posdst-=16){
           if(!linenum){
                if(!board[posdst])
-                  mvs.append(lMOVE(possrc,posdst));
+                  mvs.append(MV(possrc,posdst));
                  else
                    linenum++;
           }else{
@@ -258,7 +258,7 @@ inline void Game::paosteps(int possrc, QVector<int> &mvs){
                    continue;
                else if(tong(board[posdst],board[possrc]))
                       break;
-               else{mvs.append(lMOVE(possrc,posdst)); break;}
+               else{mvs.append(MV(possrc,posdst)); break;}
             }
         }
 
@@ -266,7 +266,7 @@ inline void Game::paosteps(int possrc, QVector<int> &mvs){
 }
 
 
-inline void Game::bingsteps(int possrc, QVector<int> &mvs){
+inline void Game::bingsteps(int possrc, QVector<MV> &mvs){
 
    int posdst=possrc;
     if(board[possrc]>=16)
@@ -274,31 +274,31 @@ inline void Game::bingsteps(int possrc, QVector<int> &mvs){
     { posdst+=16;
      if(IN_BOARD(posdst))
      if(!board[posdst])
-        mvs.append(lMOVE(possrc,posdst));
+        mvs.append(MV(possrc,posdst));
       else if(butong(board[posdst],board[possrc]))
-       mvs.append(lMOVE(possrc,posdst));
+       mvs.append(MV(possrc,posdst));
 
 
     }else{
              posdst+=16;
             if(IN_BOARD(posdst))
             if(!board[posdst])
-                mvs.append(lMOVE(possrc,posdst));
+                mvs.append(MV(possrc,posdst));
               else if(butong(board[posdst],board[possrc]))
-               mvs.append(lMOVE(possrc,posdst));
+               mvs.append(MV(possrc,posdst));
             posdst-=17;
            if(IN_BOARD(posdst))
            if(!board[posdst])
-               mvs.append(lMOVE(possrc,posdst));
+               mvs.append(MV(possrc,posdst));
              else if(butong(board[posdst],board[possrc]))
-              mvs.append(lMOVE(possrc,posdst));
+              mvs.append(MV(possrc,posdst));
 
            posdst+=2;
           if(IN_BOARD(posdst))
           if(!board[posdst])
-              mvs.append(lMOVE(possrc,posdst));
+              mvs.append(MV(possrc,posdst));
             else if(butong(board[posdst],board[possrc]))
-             mvs.append(lMOVE(possrc,posdst));
+             mvs.append(MV(possrc,posdst));
     }
     else
     if(WEI_GUO(possrc,board[possrc]))
@@ -306,9 +306,9 @@ inline void Game::bingsteps(int possrc, QVector<int> &mvs){
         posdst-=16;
              if(IN_BOARD(posdst))
              if(!board[posdst])
-                mvs.append(lMOVE(possrc,posdst));
+                mvs.append(MV(possrc,posdst));
               else if(butong(board[posdst],board[possrc]))
-               mvs.append(lMOVE(possrc,posdst));
+               mvs.append(MV(possrc,posdst));
 
 
      }else{
@@ -316,38 +316,38 @@ inline void Game::bingsteps(int possrc, QVector<int> &mvs){
         posdst-=16;
        if(IN_BOARD(posdst))
        if(!board[posdst])
-           mvs.append(lMOVE(possrc,posdst));
+           mvs.append(MV(possrc,posdst));
          else if(butong(board[posdst],board[possrc]))
-          mvs.append(lMOVE(possrc,posdst));
+          mvs.append(MV(possrc,posdst));
        posdst+=17;
       if(IN_BOARD(posdst))
       if(!board[posdst])
-          mvs.append(lMOVE(possrc,posdst));
+          mvs.append(MV(possrc,posdst));
         else if(butong(board[posdst],board[possrc]))
-         mvs.append(lMOVE(possrc,posdst));
+         mvs.append(MV(possrc,posdst));
 
       posdst-=2;
      if(IN_BOARD(posdst))
      if(!board[posdst])
-         mvs.append(lMOVE(possrc,posdst));
+         mvs.append(MV(possrc,posdst));
        else if(butong(board[posdst],board[possrc]))
-        mvs.append(lMOVE(possrc,posdst));
+        mvs.append(MV(possrc,posdst));
 
      }
 
 
 }
 
-inline void Game::jiangsteps(int possrc, QVector<int> &mvs){
+inline void Game::jiangsteps(int possrc, QVector<MV> &mvs){
 
 static const int pianyi[]={-1,1,-16,16};
 for(int i=0;i<4;i++)
 {
 if(IN_FORT(possrc+pianyi[i]))
 if(!board[possrc+pianyi[i]])
-mvs.append(lMOVE(possrc,possrc+pianyi[i]));
+mvs.append(MV(possrc,possrc+pianyi[i]));
 else if(butong(board[possrc+pianyi[i]],board[possrc]))
-mvs.append(lMOVE(possrc,possrc+pianyi[i]));
+mvs.append(MV(possrc,possrc+pianyi[i]));
 }
 /////////////////////////////////////////////////////
 if(board[possrc]>=16)
@@ -358,7 +358,7 @@ if(board[possrc]>=16)
        else if(board[posdst]!=8)
            break;
      else
-          mvs.append(lMOVE(possrc,posdst));
+          mvs.append(MV(possrc,posdst));
 
 }else{
 
@@ -369,7 +369,7 @@ if(board[possrc]>=16)
            else if(board[posdst]!=16)
                break;
          else
-              mvs.append(lMOVE(possrc,posdst));
+              mvs.append(MV(possrc,posdst));
 
 
 }
@@ -380,23 +380,23 @@ if(board[possrc]>=16)
 }
 
 
-inline void Game::shisteps(int possrc, QVector<int> &mvs){
+inline void Game::shisteps(int possrc, QVector<MV> &mvs){
 
     static const int pianyi[]={15,17,-15,-17};
     for(int i=0;i<4;i++)
     {
     if(IN_FORT(possrc+pianyi[i]))
     if(!board[possrc+pianyi[i]])
-    mvs.append(lMOVE(possrc,possrc+pianyi[i]));
+    mvs.append(MV(possrc,possrc+pianyi[i]));
     else if(butong(board[possrc+pianyi[i]],board[possrc]))
-    mvs.append(lMOVE(possrc,possrc+pianyi[i]));
+    mvs.append(MV(possrc,possrc+pianyi[i]));
     }
 
 
 }
 
 
-inline void Game::xiangsteps(int possrc, QVector<int> &mvs){
+inline void Game::xiangsteps(int possrc, QVector<MV> &mvs){
 
     static const int pianyi[]={30,34,-34,-30};
     static const int xiangyanpanyi[]={15,17,-17,-15};
@@ -404,9 +404,9 @@ inline void Game::xiangsteps(int possrc, QVector<int> &mvs){
     {
     if(IN_BOARD(possrc+pianyi[i])&&WEI_GUO(possrc+pianyi[i],board[possrc])&&!board[possrc+xiangyanpanyi[i]])
     if(!board[possrc+pianyi[i]])
-    mvs.append(lMOVE(possrc,possrc+pianyi[i]));
+    mvs.append(MV(possrc,possrc+pianyi[i]));
     else if(butong(board[possrc+pianyi[i]],board[possrc]))
-    mvs.append(lMOVE(possrc,possrc+pianyi[i]));
+    mvs.append(MV(possrc,possrc+pianyi[i]));
     }
 
 
@@ -414,7 +414,7 @@ inline void Game::xiangsteps(int possrc, QVector<int> &mvs){
 }
 
 
-inline void Game::masteps(int possrc, QVector<int> &mvs){
+inline void Game::masteps(int possrc, QVector<MV> &mvs){
     static const int pianyi[4][2] = {{-33, -31}, {-18, 14}, {-14, 18}, {31, 33}};
     static const int mayanpianyi[4]={-16, -1, 1, 16};
     for(int i=0;i<4;i++)
@@ -423,9 +423,9 @@ inline void Game::masteps(int possrc, QVector<int> &mvs){
 
     if(IN_BOARD(possrc+pianyi[i][j])&&!board[possrc+mayanpianyi[i]])
     if(!board[possrc+pianyi[i][j]])
-    mvs.append(lMOVE(possrc,possrc+pianyi[i][j]));
+    mvs.append(MV(possrc,possrc+pianyi[i][j]));
     else if(butong(board[possrc+pianyi[i][j]],board[possrc]))
-    mvs.append(lMOVE(possrc,possrc+pianyi[i][j]));
+    mvs.append(MV(possrc,possrc+pianyi[i][j]));
     }
 
 
@@ -433,16 +433,16 @@ inline void Game::masteps(int possrc, QVector<int> &mvs){
 
 
 
-bool Game::canmove(int mv){
+bool Game::canmove(MV mv){
     qDebug("canmove");
-   int possrc=lSRC(mv);
+   int possrc=mv.possrc;
    if(board[possrc]==0)return false;
    int tmp;
    if(board[possrc]<=14)
    {tmp=board[possrc]-8;}
    else
       {  tmp=board[possrc]-16;}
-    QVector <int> mvs;
+    QVector <MV> mvs;
    switch (tmp) {
    case 0:
         jiangsteps(possrc,mvs);
@@ -509,11 +509,11 @@ void Game::mousePressEvent(QMouseEvent *event){
        if(sddst)
      if(tong(sddst,sdsrc))
      { gaoliangoff(possrc);   qDebug("xiangtong"); possrc=posdst;sdsrc=sddst;gaoliangon(possrc);update();return;}
-     if(canmove(lMOVE(possrc,posdst)))
+     if(canmove(MV(possrc,posdst)))
      {qDebug("haha");
          sdsrc=0;
          gaoliangoff(possrc);
-         makemove1(lMOVE(possrc,posdst));
+         makemove1(MV(possrc,posdst));
          //unmove(lMOVE(possrc,posdst),k);
      }
    }
@@ -521,9 +521,9 @@ void Game::mousePressEvent(QMouseEvent *event){
 
 update();
 }
-int Game::makemove(int mv){
- int src=lSRC(mv);
-int dst=lDST(mv);
+int Game::makemove(MV mv){
+ int src=mv.possrc;
+int dst=mv.posdst;
 int killid=board[dst];
 int moveid=board[src];
 if(killid==8||killid==16)
@@ -536,9 +536,9 @@ nDistance++;
 qDebug("SCORE:%d",score());
 return killid;
 }
-void Game::makemove1(int mv){
-    int src=lSRC(mv);
-   int dst=lDST(mv);
+void Game::makemove1(MV mv){
+    int src=mv.possrc;
+   int dst=mv.posdst;
    int killid=board[dst];
    int moveid=board[src];
    if(killid==8||killid==16)
@@ -556,11 +556,11 @@ void Game::makemove1(int mv){
 
 
 }
-void Game::unmove(int mv, int killid){
+void Game::unmove(MV mv, int killid){
     if(killid==8||killid==16)
     gameover=false;
-    int src=lSRC(mv);
-   int dst=lDST(mv);
+    int src=mv.possrc;
+   int dst=mv.posdst;
    int id=board[dst];
    DelStone(dst,id);
    AddStone(src,id);
@@ -569,7 +569,7 @@ void Game::unmove(int mv, int killid){
    nDistance--;
    qDebug("ummove SCORE:%d",score());
 }
-inline void Game::getAllsteps(QVector<int> &mvs, bool player){
+inline void Game::getAllsteps(QVector<MV> &mvs, bool player){
     int tmp;
 
     for(int possrc=0;possrc<256;possrc++){
@@ -622,7 +622,7 @@ int Game::getMinScore(int level, int curMin)
     }
     if(gameover)
     return score();
-    QVector<int> steps;
+    QVector<MV> steps;
     getAllsteps(steps,true);
     int minInAllMaxScore = 300000;
     for(int i=0;i<steps.count();i++)
@@ -653,7 +653,7 @@ int Game::getMaxScore(int level, int curMax)
         return score();
     if(gameover)
     return score();
-    QVector<int> steps;
+    QVector<MV> steps;
     getAllsteps(steps,false);
     int maxInAllMinScore = -300000;
     for(int i=0;i<steps.count();i++)
@@ -673,10 +673,10 @@ int Game::getMaxScore(int level, int curMax)
     }
     return maxInAllMinScore;
 }
-int Game::getcomputerbeststep(){
-   int beststep;
+MV Game::getcomputerbeststep(){
+   MV beststep;
    int killid;
-   QVector<int> steps;
+   QVector<MV> steps;
     getAllsteps(steps,false);
     //qDebug("gong you %d zou fa",steps.count());
       int maxInAllMinScore = -300000;
@@ -701,10 +701,10 @@ return beststep;
 
 void Game::mouseReleaseEvent(QMouseEvent *event){
 if(computerturn){
-SearchMain();
+MV mv=getcomputerbeststep();
 
 
-makemove1(mvResult);
+makemove1(mv);
 update();
 
 }
@@ -712,8 +712,9 @@ update();
 // 超出边界(Fail-Soft)的Alpha-Beta搜索过程
  int Game::SearchFull(int vlAlpha, int vlBeta, int nDepth) {
   int i, nGenMoves, pcCaptured;
-  int vl, vlBest, mvBest;
-  QVector<int > mvs;
+  int vl, vlBest;
+  MV mvBest(0,0);
+  QVector<MV> mvs;
   // 一个Alpha-Beta完全搜索分为以下几个阶段
 
   // 1. 到达水平线，则返回局面评价值
@@ -723,7 +724,7 @@ update();
 
   // 2. 初始化最佳值和最佳走法
   vlBest = -30000; // 这样可以知道，是否一个走法都没走过(杀棋)
-  mvBest = 0;           // 这样可以知道，是否搜索到了Beta走法或PV走法，以便保存到历史表
+  //mvBest = 0;           // 这样可以知道，是否搜索到了Beta走法或PV走法，以便保存到历史表
 
   // 3. 生成全部走法，并根据历史表排序
   getAllsteps(mvs);
@@ -757,9 +758,9 @@ update();
     // 如果是杀棋，就根据杀棋步数给出评价
     return nDistance - 30000;
   }
-  if (mvBest != 0) {
+  if (mvBest.possrc!=0) {
     // 如果不是Alpha走法，就将最佳走法保存到历史表
-    nHistoryTable[mvBest] += nDepth * nDepth;
+    nHistoryTable[lMOVE(mvBest.possrc,mvBest.posdst)] += nDepth * nDepth;
     if (nDistance == 0) {
       // 搜索根节点时，总是有一个最佳走法(因为全窗口搜索不会超出边界)，将这个走法保存下来
       mvResult = mvBest;
